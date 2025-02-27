@@ -2,27 +2,42 @@ import time
 import pandas as pd
 import numpy as np
 
-CITY_DATA = { 'chicago': 'chicago.csv',
-              'new york city': 'new_york_city.csv',
-              'washington': 'washington.csv' }
+# Dictionary mapping city names to data file names
+CITY_DATA = {
+    'chicago': 'chicago.csv',
+    'new york city': 'new_york_city.csv',
+    'washington': 'washington.csv'
+}
 
 def get_user_input(prompt, valid_options):
-    """Handles user input and ensures validity."""
+    """Handles user input and ensures it matches valid options.
+    Args:
+        prompt (str): The message displayed to the user.
+        valid_options (list): List of valid input options.
+    Returns:
+        str: Validated user input.
+    """
     while True:
         user_input = input(prompt).strip().lower()
         if user_input in valid_options:
             return user_input
-        print("Invalid input. Please enter a valid option.")
+        print("Invalid input. Please try again.")
 
 def get_filters():
-    """Gathers user input for city, month, and day."""
+    """Gets user input for city, month, and day to analyze.
+    Returns:
+        tuple: City, month, and day selected by the user.
+    """
     print("\nWelcome! Let's analyze some US bikeshare data!\n")
     
+    # Get city input
     city = get_user_input("Choose a city (Chicago, New York City, Washington): ", CITY_DATA.keys())
     
+    # Get month input (January to June or 'all')
     months = ['january', 'february', 'march', 'april', 'may', 'june', 'all']
     month = get_user_input("Select a month (January to June) or 'all': ", months)
     
+    # Get day input (Monday to Sunday or 'all')
     days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'all']
     day = get_user_input("Pick a day (Monday to Sunday) or 'all': ", days)
     
@@ -30,28 +45,42 @@ def get_filters():
     return city, month, day
 
 def load_data(city, month, day):
-    """Loads data based on user selections and applies necessary filters."""
+    """Loads bikeshare data for the selected city and applies month and day filters.
+    Args:
+        city (str): City name selected by the user.
+        month (str): Month name or 'all' for no filter.
+        day (str): Day name or 'all' for no filter.
+    Returns:
+        DataFrame: Filtered bikeshare data.
+    """
     df = pd.read_csv(CITY_DATA[city])
     df['Start Time'] = pd.to_datetime(df['Start Time'])
     df['month'] = df['Start Time'].dt.month
     df['day_of_week'] = df['Start Time'].dt.day_name()
     df['hour'] = df['Start Time'].dt.hour
     
+    # Apply month filter if selected
     if month != 'all':
         months = ['january', 'february', 'march', 'april', 'may', 'june']
         df = df[df['month'] == (months.index(month) + 1)]
     
+    # Apply day filter if selected
     if day != 'all':
         df = df[df['day_of_week'] == day.title()]
     
     return df
 
 def display_common_value(df, column, description):
-    """Prints the most common value in a specific column."""
+    """Prints the most common value for a given column.
+    Args:
+        df (DataFrame): The bikeshare dataset.
+        column (str): Column name to analyze.
+        description (str): Description of the statistic.
+    """
     print(f"{description}: {df[column].mode()[0]}")
 
 def time_stats(df):
-    """Displays common travel times."""
+    """Displays statistics on the most frequent travel times."""
     print('\nAnalyzing Travel Time Statistics...\n')
     display_common_value(df, 'month', "Most Frequent Month")
     display_common_value(df, 'day_of_week', "Most Frequent Day")
@@ -59,7 +88,7 @@ def time_stats(df):
     print('-'*40)
 
 def station_stats(df):
-    """Shows popular start and end stations, as well as common routes."""
+    """Displays statistics on popular start and end stations, and trips."""
     print('\nAnalyzing Station Usage...\n')
     display_common_value(df, 'Start Station', "Most Popular Start Station")
     display_common_value(df, 'End Station', "Most Popular End Station")
@@ -75,7 +104,7 @@ def trip_duration_stats(df):
     print('-'*40)
 
 def user_stats(df):
-    """Provides user demographic insights."""
+    """Provides statistics on bikeshare users."""
     print('\nAnalyzing User Demographics...\n')
     print(f"User Types Count:\n{df['User Type'].value_counts()}")
     if 'Gender' in df:
@@ -87,7 +116,7 @@ def user_stats(df):
     print('-'*40)
 
 def display_data(df):
-    """Shows raw data upon user request in 5-row increments."""
+    """Displays raw data upon user request in 5-row increments."""
     start_loc = 0
     while True:
         show_data = input("Would you like to view 5 rows of raw data? Enter yes or no: ").strip().lower()
@@ -101,6 +130,7 @@ def display_data(df):
             break
 
 def main():
+    """Main function to execute bikeshare analysis steps."""
     while True:
         city, month, day = get_filters()
         df = load_data(city, month, day)
