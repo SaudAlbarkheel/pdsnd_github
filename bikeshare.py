@@ -2,7 +2,7 @@ import time
 import pandas as pd
 import numpy as np
 
-# Dictionary containing city data files
+# Dictionary mapping city names to data file names
 CITY_DATA = {
     'chicago': 'chicago.csv',
     'new york city': 'new_york_city.csv',
@@ -10,7 +10,13 @@ CITY_DATA = {
 }
 
 def get_user_input(prompt, valid_options):
-    """Handles user input and ensures it matches valid options."""
+    """Handles user input and ensures it matches valid options.
+    Args:
+        prompt (str): The message displayed to the user.
+        valid_options (list): List of valid input options.
+    Returns:
+        str: Validated user input.
+    """
     while True:
         user_input = input(prompt).strip().lower()
         if user_input in valid_options:
@@ -18,12 +24,20 @@ def get_user_input(prompt, valid_options):
         print("Invalid input. Please try again.")
 
 def get_filters():
-    """Gets user input for city, month, and day to analyze."""
+    """Gets user input for city, month, and day to analyze.
+    Returns:
+        tuple: City, month, and day selected by the user.
+    """
     print("\nWelcome! Let's analyze some US bikeshare data!\n")
     
+    # Get city input
     city = get_user_input("Choose a city (Chicago, New York City, Washington): ", CITY_DATA.keys())
+    
+    # Get month input (January to June or 'all')
     months = ['january', 'february', 'march', 'april', 'may', 'june', 'all']
     month = get_user_input("Select a month (January to June) or 'all': ", months)
+    
+    # Get day input (Monday to Sunday or 'all')
     days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'all']
     day = get_user_input("Pick a day (Monday to Sunday) or 'all': ", days)
     
@@ -31,24 +45,38 @@ def get_filters():
     return city, month, day
 
 def load_data(city, month, day):
-    """Loads data for the selected city and applies month and day filters."""
+    """Loads bikeshare data for the selected city and applies month and day filters.
+    Args:
+        city (str): City name selected by the user.
+        month (str): Month name or 'all' for no filter.
+        day (str): Day name or 'all' for no filter.
+    Returns:
+        DataFrame: Filtered bikeshare data.
+    """
     df = pd.read_csv(CITY_DATA[city])
     df['Start Time'] = pd.to_datetime(df['Start Time'])
     df['month'] = df['Start Time'].dt.month
     df['day_of_week'] = df['Start Time'].dt.day_name()
     df['hour'] = df['Start Time'].dt.hour
     
+    # Apply month filter if selected
     if month != 'all':
         months = ['january', 'february', 'march', 'april', 'may', 'june']
         df = df[df['month'] == (months.index(month) + 1)]
     
+    # Apply day filter if selected
     if day != 'all':
         df = df[df['day_of_week'] == day.title()]
     
     return df
 
 def display_common_value(df, column, description):
-    """Prints the most common value for a given column."""
+    """Prints the most common value for a given column.
+    Args:
+        df (DataFrame): The bikeshare dataset.
+        column (str): Column name to analyze.
+        description (str): Description of the statistic.
+    """
     print(f"{description}: {df[column].mode()[0]}")
 
 def time_stats(df):
@@ -102,6 +130,7 @@ def display_data(df):
             break
 
 def main():
+    """Main function to execute bikeshare analysis steps."""
     while True:
         city, month, day = get_filters()
         df = load_data(city, month, day)
