@@ -14,6 +14,7 @@ def get_user_input(prompt, valid_options):
             return user_input
         print("Invalid input. Please enter a valid option.")
 
+# Function to get user input for city, month, and day
 def get_filters():
     """Gathers user input for city, month, and day."""
     print("\nWelcome! Let's analyze some US bikeshare data!\n")
@@ -29,6 +30,7 @@ def get_filters():
     print('-'*40)
     return city, month, day
 
+# Function to load and filter data based on user input
 def load_data(city, month, day):
     """Loads data based on user selections and applies necessary filters."""
     df = pd.read_csv(CITY_DATA[city])
@@ -50,6 +52,7 @@ def display_common_value(df, column, description):
     """Prints the most common value in a specific column."""
     print(f"{description}: {df[column].mode()[0]}")
 
+# Function to display statistics on most frequent times of travel
 def time_stats(df):
     """Displays common travel times."""
     print('\nAnalyzing Travel Time Statistics...\n')
@@ -58,6 +61,7 @@ def time_stats(df):
     display_common_value(df, 'hour', "Most Frequent Start Hour")
     print('-'*40)
 
+# Function to display statistics on most popular stations and trips
 def station_stats(df):
     """Shows popular start and end stations, as well as common routes."""
     print('\nAnalyzing Station Usage...\n')
@@ -67,6 +71,7 @@ def station_stats(df):
     display_common_value(df, 'Trip Route', "Most Common Trip Route")
     print('-'*40)
 
+# Function to calculate total and average trip duration
 def trip_duration_stats(df):
     """Calculates total and average trip durations."""
     print('\nAnalyzing Trip Durations...\n')
